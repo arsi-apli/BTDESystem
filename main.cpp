@@ -18,6 +18,7 @@
 #include "Extruder.h"
 
 extern HardwareSerial Serial;
+extern HardwareSerial Serial2;
 
 //-------------------------------------------------------------------------
 #define ENDSTOP_FEED_LENGTH 15// Length of filament retracted/pushed on endstop hit
@@ -94,6 +95,11 @@ extern HardwareSerial Serial;
 
 
 #define SERIAL_BAUDRATE 115200
+
+//MMU2
+#define FW_VERSION 90            
+#define FW_BUILDNR 168
+//
 
 enum Extruders {
     EXTRUDER_X,
@@ -217,9 +223,237 @@ void setup() {
     stepperX.enableMotor();
     setupTimer1();
     setupTimer3();
+    Serial2.begin(SERIAL_BAUDRATE);
+    delay(100);
+    Serial.println(F("Sending START command to mk3 controller board"));
+    Serial2.print(F("start\n")); // attempt to tell the mk3 that the mmu is present
+}
 
+void handleFirmwareInfo() {
+    switch (Serial2.read()) {
+        case '0':
+            Serial2.print(F("ok\n"));
+            break;
+        case '1':
+            Serial2.print(FW_VERSION);
+            Serial2.print(F("ok\n"));
+            break;
+        case '2':
+            Serial2.print(FW_BUILDNR);
+            Serial2.print(F("ok\n"));
+            break;
+        default:
+            Serial.println(F("Error response from marlin"));
+            break;
+    }
+    Serial2.read(); // skip  \n
+}
+
+void handle12vMode() {
+    switch (Serial2.read()) {
+        case '1':
+            Serial2.print(F("ok\n"));
+            break;
+        default:
+            Serial.println(F("Error response from marlin"));
+            break;
+    }
+    Serial2.read(); // skip  \n
+}
+
+void handleFindaStatus() {
+    switch (Serial2.read()) {
+        case '0':
+            Serial2.print(F("1"));
+            Serial2.print(F("ok\n"));
+            break;
+        default:
+            Serial.println(F("Error response from marlin"));
+            break;
+    }
+    Serial2.read(); // skip  \n
+}
+
+void handleFilamentType() {
+    switch (Serial2.read()) {
+        default:
+            Serial2.print(F("ok\n"));
+            break;
+    }
+    Serial2.read(); // skip  \n
+}
+
+void handleToolChange() {
+    switch (Serial2.read()) {
+        case '0':
+            Serial2.print(F("ok\n"));
+            break;
+        case '1':
+            Serial2.print(F("ok\n"));
+            break;
+        case '2':
+            Serial2.print(F("ok\n"));
+            break;
+        case '3':
+            Serial2.print(F("ok\n"));
+            break;
+        case '4':
+            Serial2.print(F("ok\n"));
+            break;
+        default:
+            Serial.println(F("Error response from marlin"));
+            break;
+    }
+    Serial2.read(); // skip  \n
+}
+
+void handleToolChangeFeedToExtruder() {
+    switch (Serial2.read()) {
+        case '0':
+            Serial2.print(F("ok\n"));
+            break;
+        default:
+            Serial.println(F("Error response from marlin"));
+            break;
+    }
+    Serial2.read(); // skip  \n
+}
+
+void handleLoadFilament() {
+    switch (Serial2.read()) {
+        case '0':
+            Serial2.print(F("ok\n"));
+            break;
+        case '1':
+            Serial2.print(F("ok\n"));
+            break;
+        case '2':
+            Serial2.print(F("ok\n"));
+            break;
+        case '3':
+            Serial2.print(F("ok\n"));
+            break;
+        case '4':
+            Serial2.print(F("ok\n"));
+            break;
+        default:
+            Serial.println(F("Error response from marlin"));
+            break;
+    }
+    Serial2.read(); // skip  \n
+}
+
+void handleUnLoadFilament() {
+    switch (Serial2.read()) {
+        case '0':
+            Serial2.print(F("ok\n"));
+            break;
+        case '1':
+            Serial2.print(F("ok\n"));
+            break;
+        case '2':
+            Serial2.print(F("ok\n"));
+            break;
+        case '3':
+            Serial2.print(F("ok\n"));
+            break;
+        case '4':
+            Serial2.print(F("ok\n"));
+            break;
+        default:
+            Serial.println(F("Error response from marlin"));
+            break;
+    }
+    Serial2.read(); // skip  \n
+}
+
+void handleEjectFilament() {
+    switch (Serial2.read()) {
+        case '0':
+            Serial2.print(F("ok\n"));
+            break;
+        case '1':
+            Serial2.print(F("ok\n"));
+            break;
+        case '2':
+            Serial2.print(F("ok\n"));
+            break;
+        case '3':
+            Serial2.print(F("ok\n"));
+            break;
+        case '4':
+            Serial2.print(F("ok\n"));
+            break;
+        default:
+            Serial.println(F("Error response from marlin"));
+            break;
+    }
+    Serial2.read(); // skip  \n
 }
 
 void loop() {
+    if (Serial2.available() > 0) {
+        switch (Serial2.read()) {
+            case 'S': //firmware info
+                //                - MMU <= 'S0\n'
+                //                - MMU = > 'ok\n'
+                //                - MMU <= 'S1\n'
+                //                - MMU = > 'ok*Firmware version*\n'
+                //                - MMU <= 'S2\n'
+                //                - MMU = > 'ok*Build number*\n'
+                handleFirmwareInfo();
+                break;
+            case 'M': // 12V mode
+                //                - MMU <= 'M1\n'
+                //                - MMU => 'ok\n'
+                handle12vMode();
+                break;
+            case 'P': //FINDA status
+                //                - MMU <= 'P0\n'
+                //                - MMU => '*FINDA status*\n'
+                //                *FINDA status* is 1 if the is filament loaded to the extruder, 0 otherwise. This could be used as filament runout sensor if probed regularly.
+                handleFindaStatus();
+                break;
+            case 'F':
+                // 'F' command is acknowledged but no processing goes on at the moment
+                // will be useful for flexible material down the road
+                handleFilamentType();
+                break;
+            case 'T': //tool change
+                //                - MMU <= 'T*Filament index*\n'
+                //                MMU sends
+                //                - MMU => 'ok\n'
+                //                as soon as the filament is fed down to the extruder. We follow with
+                //                - MMU <= 'C0\n'
+                //                MMU will feed a few more millimeters of filament for the extruder gears to grab.
+                //                When done, the MMU sends
+                handleToolChange();
+                break;
+            case 'C': //feed a few more millimeters of filament for the extruder gears to grab.
+                handleToolChangeFeedToExtruder();
+                break;
+            case 'L': //load filament
+                //                - MMU <= 'L*Filament index*\n'
+                //                MMU will feed filament down to the extruder, when done
+                //                - MMU => 'ok\n'
+                handleLoadFilament();
+                break;
+            case 'U': //unload filament
+                //                - MMU <= 'U0\n'
+                //                MMU will retract current filament from the extruder, when done
+                //                - MMU => 'ok\n'
+                handleUnLoadFilament();
+                break;
+            case 'E': //eject filament
+                //                - MMU <= 'E*Filament index*\n'
+                //                - MMU => 'ok\n'
+                handleEjectFilament();
+                break;
+            default:
+                Serial.println(F("Error response from marlin"));
+                break;
+
+        }
+    }
 }
 
