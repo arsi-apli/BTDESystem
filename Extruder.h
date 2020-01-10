@@ -26,6 +26,16 @@ public:
     void enableMotor();
     void didableMotor();
     void move(int mm);
+    float getStepsPerMm();
+    void setStepsPerMm(float stepsPerMm);
+    float getAcceleration();
+    void setAcceleration(float acceleration);
+    uint8_t getIsrKoef();
+    void setIsrKoef(uint8_t isrKoef);
+    boolean isRevert();
+    void setRevert(boolean revert);
+    
+    uint32_t getStepsToDo();
 
     enum Direction {
         STOPPED,

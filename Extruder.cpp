@@ -18,7 +18,6 @@
 
 #define ROUNDED_INT(f) ((int32_t)(f >= 0.0f ? (f + 0.5f) : (f - 0.5f)))
 #define LENGTH(a) (sizeof(a)/sizeof(*a))
-
 Extruder::Extruder(const uint8_t stepPin, const uint8_t dirPin, const uint8_t enablePin, const float stepsPerMm, const float acceleration, const uint8_t isrKoef, const boolean revert) {
     this->stepPin = stepPin;
     this->dirPin = dirPin;
@@ -116,5 +115,35 @@ void Extruder::timer_isr() {
         direction = STOPPED;
     }
 }
+    //---------------------getters--setters----------------------
+    
+    float Extruder::getStepsPerMm(){
+        return this->stepsPerMm;
+    }
+    void Extruder::setStepsPerMm(float stepsPerMm){
+        this->stepsPerMm = stepsPerMm;
+    }
+    float Extruder::getAcceleration(){
+        return this->acceleration;
+    }
+    void Extruder::setAcceleration(float acceleration){
+        this->acceleration = acceleration;
+    }
+    uint8_t Extruder::getIsrKoef(){
+        return this->isrKoef;
+    }
+    void Extruder::setIsrKoef(uint8_t isrKoef){
+        this->isrKoef = isrKoef;
+    }
+    boolean Extruder::isRevert(){
+        return this->revert;
+    }
+    void Extruder::setRevert(boolean revert){
+        this->revert = revert;
+    }
+    
+    uint32_t Extruder::getStepsToDo(){
+        return this->stepsToDo;
+    }
 
 
