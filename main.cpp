@@ -230,162 +230,214 @@ void setup() {
 }
 
 void handleFirmwareInfo() {
-    switch (Serial2.read()) {
+    unsigned char c = Serial2.read();
+    switch (c) {
         case '0':
             Serial2.print(F("ok\n"));
+            Serial.println(F("S0"));
             break;
         case '1':
             Serial2.print(FW_VERSION);
             Serial2.print(F("ok\n"));
+            Serial.println(F("S1"));
             break;
         case '2':
             Serial2.print(FW_BUILDNR);
             Serial2.print(F("ok\n"));
+            Serial.println(F("S2"));
             break;
         default:
-            Serial.println(F("Error response from marlin"));
+            Serial.print(F("S"));
+            Serial.print(c);
+            Serial.println(F(" Error response from marlin"));
             break;
     }
     Serial2.read(); // skip  \n
 }
 
 void handle12vMode() {
-    switch (Serial2.read()) {
+    unsigned char c = Serial2.read();
+    switch (c) {
         case '1':
             Serial2.print(F("ok\n"));
+            Serial.println(F("M1"));
             break;
         default:
-            Serial.println(F("Error response from marlin"));
+            Serial.print(F("M"));
+            Serial.print(c);
+            Serial.println(F(" Error response from marlin"));
             break;
     }
     Serial2.read(); // skip  \n
 }
 
 void handleFindaStatus() {
-    switch (Serial2.read()) {
+    unsigned char c = Serial2.read();
+    switch (c) {
         case '0':
             Serial2.print(F("1"));
             Serial2.print(F("ok\n"));
+            Serial.println(F("P0"));
             break;
         default:
-            Serial.println(F("Error response from marlin"));
+            Serial.print(F("P"));
+            Serial.print(c);
+            Serial.println(F(" Error response from marlin"));
             break;
     }
     Serial2.read(); // skip  \n
 }
 
 void handleFilamentType() {
-    switch (Serial2.read()) {
+    unsigned char c = Serial2.read();
+    switch (c) {
         default:
             Serial2.print(F("ok\n"));
+            Serial.println(F("Handle filament type..."));
             break;
     }
     Serial2.read(); // skip  \n
 }
 
 void handleToolChange() {
-    switch (Serial2.read()) {
+    unsigned char c = Serial2.read();
+    switch (c) {
         case '0':
             Serial2.print(F("ok\n"));
+            Serial.println(F("T0"));
             break;
         case '1':
             Serial2.print(F("ok\n"));
+            Serial.println(F("T1"));
             break;
         case '2':
             Serial2.print(F("ok\n"));
+            Serial.println(F("T2"));
             break;
         case '3':
             Serial2.print(F("ok\n"));
+            Serial.println(F("T3"));
             break;
         case '4':
             Serial2.print(F("ok\n"));
+            Serial.println(F("T4"));
             break;
         default:
-            Serial.println(F("Error response from marlin"));
+            Serial.print(F("T"));
+            Serial.print(c);
+            Serial.println(F(" Error response from marlin"));
             break;
     }
     Serial2.read(); // skip  \n
 }
 
 void handleToolChangeFeedToExtruder() {
-    switch (Serial2.read()) {
+    unsigned char c = Serial2.read();
+    switch (c) {
         case '0':
             Serial2.print(F("ok\n"));
+            Serial.println(F("C0"));
             break;
         default:
-            Serial.println(F("Error response from marlin"));
+            Serial.print(F("C"));
+            Serial.print(c);
+            Serial.println(F(" Error response from marlin"));
             break;
     }
     Serial2.read(); // skip  \n
 }
 
 void handleLoadFilament() {
-    switch (Serial2.read()) {
+    unsigned char c = Serial2.read();
+    switch (c) {
         case '0':
             Serial2.print(F("ok\n"));
+            Serial.println(F("L0"));
             break;
         case '1':
             Serial2.print(F("ok\n"));
+            Serial.println(F("L1"));
             break;
         case '2':
             Serial2.print(F("ok\n"));
+            Serial.println(F("L2"));
             break;
         case '3':
             Serial2.print(F("ok\n"));
+            Serial.println(F("L3"));
             break;
         case '4':
             Serial2.print(F("ok\n"));
+            Serial.println(F("L4"));
             break;
         default:
-            Serial.println(F("Error response from marlin"));
+            Serial.print(F("L"));
+            Serial.print(c);
+            Serial.println(F(" Error response from marlin"));
             break;
     }
     Serial2.read(); // skip  \n
 }
 
 void handleUnLoadFilament() {
-    switch (Serial2.read()) {
+    unsigned char c = Serial2.read();
+    switch (c) {
         case '0':
             Serial2.print(F("ok\n"));
+            Serial.println(F("U0"));
             break;
         case '1':
             Serial2.print(F("ok\n"));
+            Serial.println(F("U1"));
             break;
         case '2':
             Serial2.print(F("ok\n"));
+            Serial.println(F("U2"));
             break;
         case '3':
             Serial2.print(F("ok\n"));
+            Serial.println(F("U3"));
             break;
         case '4':
             Serial2.print(F("ok\n"));
+            Serial.println(F("U4"));
             break;
         default:
-            Serial.println(F("Error response from marlin"));
+            Serial.print(F("U"));
+            Serial.print(c);
+            Serial.println(F(" Error response from marlin"));
             break;
     }
     Serial2.read(); // skip  \n
 }
 
 void handleEjectFilament() {
-    switch (Serial2.read()) {
+    unsigned char c = Serial2.read();
+    switch (c) {
         case '0':
             Serial2.print(F("ok\n"));
+            Serial.println(F("E0"));
             break;
         case '1':
             Serial2.print(F("ok\n"));
+            Serial.println(F("E1"));
             break;
         case '2':
             Serial2.print(F("ok\n"));
+            Serial.println(F("E2"));
             break;
         case '3':
             Serial2.print(F("ok\n"));
+            Serial.println(F("E3"));
             break;
         case '4':
             Serial2.print(F("ok\n"));
+            Serial.println(F("E4"));
             break;
         default:
-            Serial.println(F("Error response from marlin"));
+            Serial.print(F("E"));
+            Serial.print(c);
+            Serial.println(F(" Error response from marlin"));
             break;
     }
     Serial2.read(); // skip  \n
@@ -393,7 +445,8 @@ void handleEjectFilament() {
 
 void loop() {
     if (Serial2.available() > 0) {
-        switch (Serial2.read()) {
+        unsigned char c = Serial2.read();
+        switch (c) {
             case 'S': //firmware info
                 //                - MMU <= 'S0\n'
                 //                - MMU = > 'ok\n'
@@ -450,7 +503,8 @@ void loop() {
                 handleEjectFilament();
                 break;
             default:
-                Serial.println(F("Error response from marlin"));
+                Serial.print(F("Unknown command from Marlin received: "));
+                Serial.print(c);
                 break;
 
         }
