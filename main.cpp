@@ -17,11 +17,16 @@
 #include <avr/io.h>
 #include "Extruder.h"
 
+
 extern HardwareSerial Serial;
 extern HardwareSerial Serial2;
 
 //-------------------------------------------------------------------------
 #define ENDSTOP_FEED_LENGTH 15// Length of filament retracted/pushed on endstop hit
+#define BOWDEN_EXTRUDER_TO_COMPENSATOR_TUBE_LENGTH 500 //PTFE tube length in mm
+#define COMPENSATOR_LENGTH 90 //Length of compensator including quick connectors
+#define COMPENSATOR_TO_JOINER_TUBE_LENGTH 200 // PTFE tube length in mm + mm to inactive filament position in joiner
+#define JOINER_INACTIVE_POSITION_TO_DIRECT_EXTRUDER 25 // Length from inactive position in joiner to direct extruder in mm
 
 //--------------Extruders--------------------------------------------------
 #define ETRUDER_X_STEPS_PER_MM 391
@@ -99,6 +104,8 @@ extern HardwareSerial Serial2;
 //MMU2
 #define FW_VERSION 90            
 #define FW_BUILDNR 168
+//BTDESystem
+#define BTDE_VERSION "1.0 Beta"
 //
 
 enum Extruders {
@@ -207,6 +214,27 @@ void setupTimer3() {
     interrupts();
 }
 
+void printUsbHelp() {
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("E0-E4 eject filament from bowden extruder."));
+    Serial.println(F("     Note that the filament must be pulled out from the direct extruder!"));
+    Serial.println();
+    Serial.println(F("C0-C4 load filament from bowden extruder to half of compensator."));
+    Serial.println(F("     Note that as next, you must manually introduce the filament into the carriage"));
+    Serial.println();
+    Serial.println(F("L0-L4 load filament from half of compensator to inactive position in joiner"));
+    Serial.println();
+    Serial.println(F("I0-I4 unload the filament from the direct extruder to inactive position in joiner."));
+    Serial.println(F("     Note that the filament must be pulled out from the direct extruder!"));
+    Serial.println();
+    Serial.println(F("T0-T4 load the filament into the direct extruder idler."));
+    Serial.println(F("     Note that as next, must direct extruder load the filament"));
+    Serial.println();
+    Serial.println(F("? Show curent filaments/extruders status"));
+    Serial.println();
+    Serial.println(F("****************************************************************************"));
+}
+
 void setup() {
     Serial.begin(SERIAL_BAUDRATE);
     pinMode(PIN_LED, OUTPUT); //led
@@ -225,7 +253,10 @@ void setup() {
     setupTimer3();
     Serial2.begin(SERIAL_BAUDRATE);
     delay(100);
-    Serial.println(F("Sending START command to mk3 controller board"));
+    Serial.print(F("BTDESystem "));
+    Serial.println(F(BTDE_VERSION));
+    Serial.println(F("Sending START command to Marlin"));
+    printUsbHelp();
     Serial2.print(F("start\n")); // attempt to tell the mk3 that the mmu is present
 }
 
@@ -444,6 +475,27 @@ void handleEjectFilament() {
 }
 
 void loop() {
+    //Handle USB Serial port
+    if (Serial.available() > 0) {
+        unsigned char c = Serial2.read();
+        switch (c) {
+            case 'E': //Ex eject filament from bowden extruder
+                break;
+            case 'C': //Cx load filament into the bowden extruder and push it in half of compensator
+                // as next, user must manually introduce the filament into the carriage
+                break;
+            case 'L': //Lx load filament into inactive position in joiner, from half of compensator
+                break;
+            case 'T': //Tx load the filament into the direct extruder idler.
+                break;
+            case 'I': //Ix unload the filament from the direct extruder to inactive position in joiner.
+                break;
+            case '?': //Show current status. 
+                break;
+
+        }
+    }
+    //handle Marlin serial port
     if (Serial2.available() > 0) {
         unsigned char c = Serial2.read();
         switch (c) {
