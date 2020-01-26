@@ -22,7 +22,7 @@ extern HardwareSerial Serial;
 extern HardwareSerial Serial2;
 
 //-------------------------------------------------------------------------
-#define ENDSTOP_FEED_LENGTH 15// Length of filament retracted/pushed on endstop hit
+#define ENDSTOP_FEED_LENGTH 10// Length of filament retracted/pushed on endstop hit
 #define BOWDEN_EXTRUDER_TO_COMPENSATOR_TUBE_LENGTH 500 //PTFE tube length in mm
 #define COMPENSATOR_LENGTH 90 //Length of compensator including quick connectors
 #define COMPENSATOR_TO_JOINER_TUBE_LENGTH 200 // PTFE tube length in mm + mm to inactive filament position in joiner
@@ -215,6 +215,10 @@ void setupTimer3() {
 }
 
 void printUsbHelp() {
+    Serial.println("\033[2J");
+    Serial.println(F("****************************************************************************"));
+    Serial.print(F("BTDESystem "));
+    Serial.println(F(BTDE_VERSION));
     Serial.println(F("****************************************************************************"));
     Serial.println(F("E0-E4 eject filament from bowden extruder."));
     Serial.println(F("     Note that the filament must be pulled out from the direct extruder!"));
@@ -474,23 +478,81 @@ void handleEjectFilament() {
     Serial2.read(); // skip  \n
 }
 
+void usbShowStatus() {
+    Serial.println("\033[2J");
+    Serial.println(F("****************************************************************************"));
+    Serial.print(F("BTDESystem "));
+    Serial.println(F(BTDE_VERSION));
+    Serial.println(F("****************************************************************************"));
+    Serial.print(F("Active extruder: "));
+    Serial.println(currentExtruder);
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("To continue press enter"));
+}
+
+void usbEjectFromBowden() {
+    Serial.println("\033[2J");
+    Serial.println(F("****************************************************************************"));
+    Serial.print(F("BTDESystem "));
+    Serial.println(F(BTDE_VERSION));
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("Eject filament from bowden extruder."));
+    Serial.println(F("     Note that the filament must be pulled out from the direct extruder!"));
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("Enter extruder number to eject from 0-4"));
+    while (!Serial.available());
+    int c = Serial.read();
+    switch (c) {
+        case '0':
+            Serial.println(F("Ejecting filament from bowden extruder 0"));
+            break;
+        case '1':
+            Serial.println(F("Ejecting filament from bowden extruder 1"));
+            break;
+        case '2':
+            Serial.println(F("Ejecting filament from bowden extruder 2"));
+            break;
+        case '3':
+            Serial.println(F("Ejecting filament from bowden extruder 3"));
+            break;
+        case '4':
+            Serial.println(F("Ejecting filament from bowden extruder 4"));
+            break;
+        default:
+            Serial.println(F(" Error input. Supported numbers are 0,1,2,3,4"));
+            Serial.println(F(" Press ENTER"));
+            break;
+    }
+    Serial2.read(); // skip  \n
+}
+
 void loop() {
     //Handle USB Serial port
     if (Serial.available() > 0) {
-        unsigned char c = Serial2.read();
+        int c = Serial.read();
         switch (c) {
             case 'E': //Ex eject filament from bowden extruder
+            case 'e': //Ex eject filament from bowden extruder
+                usbEjectFromBowden();
                 break;
             case 'C': //Cx load filament into the bowden extruder and push it in half of compensator
+            case 'c': //Cx load filament into the bowden extruder and push it in half of compensator
                 // as next, user must manually introduce the filament into the carriage
                 break;
             case 'L': //Lx load filament into inactive position in joiner, from half of compensator
+            case 'l': //Lx load filament into inactive position in joiner, from half of compensator
                 break;
             case 'T': //Tx load the filament into the direct extruder idler.
+            case 't': //Tx load the filament into the direct extruder idler.
                 break;
             case 'I': //Ix unload the filament from the direct extruder to inactive position in joiner.
+            case 'i': //Ix unload the filament from the direct extruder to inactive position in joiner.
                 break;
             case '?': //Show current status. 
+                usbShowStatus();
+                break;
+            default:
+                printUsbHelp();
                 break;
 
         }
