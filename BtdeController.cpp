@@ -111,21 +111,20 @@ boolean BtdeController::isLoadedFromEeprom() {
 
 void BtdeController::initSystem() {
     loadFromEeprom();
-    switch (this->systemConfig.currentExtruderName) {
-        case EXTRUDER_X:
-            extruders[EXTRUDER_X].enableMotor();
-            break;
-        case EXTRUDER_Y:
-            extruders[EXTRUDER_Y].enableMotor();
-            break;
-        case EXTRUDER_Z:
-            extruders[EXTRUDER_Z].enableMotor();
-            break;
-        case EXTRUDER_E0:
-            extruders[EXTRUDER_E0].enableMotor();
-            break;
-        case EXTRUDER_E1:
-            extruders[EXTRUDER_E1].enableMotor();
-            break;
+    selectExtruderMotor(this->systemConfig.currentExtruderName,false);
+}
+
+void BtdeController::selectExtruderMotor(ExtrudersNames extruderName, boolean eeprom) {
+    for (int i = 0; i < EXTRUDER_END; i++) {
+        if (i == extruderName) {
+            extruders[i].enableMotor();
+        } else {
+            extruders[i].didableMotor();
+        }
     }
+    systemConfig.currentExtruderName = extruderName;
+    if (eeprom) {
+        saveToEeprom();
+    }
+
 }

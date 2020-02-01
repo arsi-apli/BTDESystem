@@ -26,6 +26,7 @@ public:
         EXTRUDER_Z,
         EXTRUDER_E0,
         EXTRUDER_E1,
+        EXTRUDER_END,
     };
 
     enum FilamentStatus {
@@ -50,6 +51,7 @@ public:
     void saveToEeprom();
     boolean isLoadedFromEeprom();
     void initSystem();
+    void selectExtruderMotor(ExtrudersNames extruderName, boolean eeprom);
 
 private:
     SystemConfig systemConfig;
