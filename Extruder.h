@@ -71,7 +71,7 @@ private:
 
     volatile float stepsPerMm;
 
-    volatile const PROGMEM float accelerationCurve[46] = {1,
+    volatile const  float accelerationCurve[46] = {1,
         1,
         0.5,
         0.333333333333333,

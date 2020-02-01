@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/BtdeController.o \
 	${OBJECTDIR}/Extruder.o \
 	${OBJECTDIR}/main.o
 
@@ -62,6 +63,11 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/btdesystem: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	avr-gcc -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/btdesystem ${OBJECTFILES} ${LDLIBSOPTIONS} ${FLAGS_LINKER}
+
+${OBJECTDIR}/BtdeController.o: BtdeController.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I${INCLUDE} -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/BtdeController.o BtdeController.cpp
 
 ${OBJECTDIR}/Extruder.o: Extruder.cpp 
 	${MKDIR} -p ${OBJECTDIR}
