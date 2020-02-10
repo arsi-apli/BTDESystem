@@ -29,12 +29,10 @@ extern HardwareSerial Serial2;
 
 
 
- BtdeController controller;
-
-
+BtdeController controller;
 
 ISR(TIMER1_COMPA_vect) {
-   controller.timerIsr();
+    controller.timerIsr();
 }
 
 ISR(TIMER3_COMPA_vect) {
@@ -113,7 +111,7 @@ void printUsbHelp() {
 
 void setup() {
     Serial.begin(SERIAL_BAUDRATE);
-    
+
     pinMode(PIN_LED, OUTPUT); //led
 
     pinMode(PIN_X_MIN, INPUT);
@@ -212,22 +210,37 @@ void handleToolChange() {
     unsigned char c = Serial2.read();
     switch (c) {
         case '0':
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_X) == BtdeController::IN_JOINER) {
+                controller.toolChange(BtdeController::EXTRUDER_X);
+            }
             Serial2.print(F("ok\n"));
             Serial.println(F("T0"));
             break;
         case '1':
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_Y) == BtdeController::IN_JOINER) {
+                controller.toolChange(BtdeController::EXTRUDER_Y);
+            }
             Serial2.print(F("ok\n"));
             Serial.println(F("T1"));
             break;
         case '2':
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_Z) == BtdeController::IN_JOINER) {
+                controller.toolChange(BtdeController::EXTRUDER_Z);
+            }
             Serial2.print(F("ok\n"));
             Serial.println(F("T2"));
             break;
         case '3':
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_E0) == BtdeController::IN_JOINER) {
+                controller.toolChange(BtdeController::EXTRUDER_E0);
+            }
             Serial2.print(F("ok\n"));
             Serial.println(F("T3"));
             break;
         case '4':
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_E1) == BtdeController::IN_JOINER) {
+                controller.toolChange(BtdeController::EXTRUDER_E1);
+            }
             Serial2.print(F("ok\n"));
             Serial.println(F("T4"));
             break;
@@ -364,40 +377,297 @@ void usbShowStatus() {
     Serial.println(F("To continue press enter"));
 }
 
-void usbEjectFromBowden() {
+void usbLoadToCompensatorError(BtdeController::ExtrudersNames extruder) {
     Serial.println("\033[2J");
     Serial.println(F("****************************************************************************"));
     Serial.print(F("BTDESystem "));
     Serial.println(F(BTDE_VERSION));
     Serial.println(F("****************************************************************************"));
-    Serial.println(F("Eject filament from bowden extruder."));
-    Serial.println(F("     Note that the filament must be pulled out from the direct extruder!"));
+    Serial.println(F("Error while loading of filament!!!!!!"));
+    Serial.println(F("****************************************************************************"));
+    Serial.print(F("Current extruder status: "));
+    switch (controller.getFilamentStatus(extruder)) {
+        case BtdeController::IN_COMPENSATOR:
+            Serial.println(F("In compensator"));
+            break;
+        case BtdeController::IN_JOINER:
+            Serial.println(F("In joiner"));
+            break;
+        case BtdeController::LOADED:
+            Serial.println(F("Loaded"));
+            break;
+        case BtdeController::LOADING:
+            Serial.println(F("Loading"));
+            break;
+        case BtdeController::UNLOADED:
+            break;
+    }
+}
+
+void usbLoadToCompensator() {
+    Serial.println("\033[2J");
+    Serial.println(F("****************************************************************************"));
+    Serial.print(F("BTDESystem "));
+    Serial.println(F(BTDE_VERSION));
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("Load filament from bowden extruder to compensator."));
     Serial.println(F("****************************************************************************"));
     Serial.println(F("Enter extruder number to eject from 0-4"));
     while (!Serial.available());
     int c = Serial.read();
     switch (c) {
         case '0':
-            Serial.println(F("Ejecting filament from bowden extruder 0"));
+            Serial.println(F("Loading filament to Compensator 0"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_X) == BtdeController::UNLOADED) {
+                controller.loadToCompensator(BtdeController::EXTRUDER_X);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_X);
+            }
             break;
         case '1':
-            Serial.println(F("Ejecting filament from bowden extruder 1"));
+            Serial.println(F("Loading filament to Compensator 1"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_Y) == BtdeController::UNLOADED) {
+                controller.loadToCompensator(BtdeController::EXTRUDER_Y);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_Y);
+            }
             break;
         case '2':
-            Serial.println(F("Ejecting filament from bowden extruder 2"));
+            Serial.println(F("Loading filament to Compensator 2"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_Z) == BtdeController::UNLOADED) {
+                controller.loadToCompensator(BtdeController::EXTRUDER_Z);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_Z);
+            }
             break;
         case '3':
-            Serial.println(F("Ejecting filament from bowden extruder 3"));
+            Serial.println(F("Loading filament to Compensator 3"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_E0) == BtdeController::UNLOADED) {
+                controller.loadToCompensator(BtdeController::EXTRUDER_E0);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_E0);
+            }
             break;
         case '4':
-            Serial.println(F("Ejecting filament from bowden extruder 4"));
+            Serial.println(F("Loading filament to Compensator 4"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_E1) == BtdeController::UNLOADED) {
+                controller.loadToCompensator(BtdeController::EXTRUDER_E1);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_E1);
+            }
             break;
         default:
             Serial.println(F(" Error input. Supported numbers are 0,1,2,3,4"));
-            Serial.println(F(" Press ENTER"));
             break;
     }
-    Serial.read(); // skip  \n
+    Serial.println(F(" Press ENTER to continue"));
+}
+
+void usbLoadToJoiner() {
+    Serial.println("\033[2J");
+    Serial.println(F("****************************************************************************"));
+    Serial.print(F("BTDESystem "));
+    Serial.println(F(BTDE_VERSION));
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("Load filament from compensator to joiner."));
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("Enter extruder number to eject from 0-4"));
+    while (!Serial.available());
+    int c = Serial.read();
+    switch (c) {
+        case '0':
+            Serial.println(F("Loading filament to Joiner 0"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_X) == BtdeController::IN_COMPENSATOR
+                    || controller.getFilamentStatus(BtdeController::EXTRUDER_X) == BtdeController::LOADED
+                    || controller.getFilamentStatus(BtdeController::EXTRUDER_X) == BtdeController::WAIT_FOR_DIRECT) {
+                controller.loadToJoiner(BtdeController::EXTRUDER_X);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_X);
+            }
+            break;
+        case '1':
+            Serial.println(F("Loading filament to Joiner 1"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_Y) == BtdeController::IN_COMPENSATOR
+                    || controller.getFilamentStatus(BtdeController::EXTRUDER_Y) == BtdeController::LOADED
+                    || controller.getFilamentStatus(BtdeController::EXTRUDER_Y) == BtdeController::WAIT_FOR_DIRECT) {
+                controller.loadToJoiner(BtdeController::EXTRUDER_Y);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_Y);
+            }
+            break;
+        case '2':
+            Serial.println(F("Loading filament to Joiner 2"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_Z) == BtdeController::IN_COMPENSATOR
+                    || controller.getFilamentStatus(BtdeController::EXTRUDER_Z) == BtdeController::LOADED
+                    || controller.getFilamentStatus(BtdeController::EXTRUDER_Z) == BtdeController::WAIT_FOR_DIRECT) {
+                controller.loadToJoiner(BtdeController::EXTRUDER_Z);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_Z);
+            }
+            break;
+        case '3':
+            Serial.println(F("Loading filament to Joiner 3"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_E0) == BtdeController::IN_COMPENSATOR
+                    || controller.getFilamentStatus(BtdeController::EXTRUDER_E0) == BtdeController::LOADED
+                    || controller.getFilamentStatus(BtdeController::EXTRUDER_E0) == BtdeController::WAIT_FOR_DIRECT) {
+                controller.loadToJoiner(BtdeController::EXTRUDER_E0);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_E0);
+            }
+            break;
+        case '4':
+            Serial.println(F("Loading filament to Joiner 4"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_E1) == BtdeController::IN_COMPENSATOR
+                    || controller.getFilamentStatus(BtdeController::EXTRUDER_E1) == BtdeController::LOADED
+                    || controller.getFilamentStatus(BtdeController::EXTRUDER_E1) == BtdeController::WAIT_FOR_DIRECT) {
+                controller.loadToJoiner(BtdeController::EXTRUDER_E1);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_E1);
+            }
+            break;
+        default:
+            Serial.println(F(" Error input. Supported numbers are 0,1,2,3,4"));
+            break;
+    }
+    Serial.println(F(" Press ENTER to continue"));
+}
+
+void usbToolChange() {
+    Serial.println("\033[2J");
+    Serial.println(F("****************************************************************************"));
+    Serial.print(F("BTDESystem "));
+    Serial.println(F(BTDE_VERSION));
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("Tool change."));
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("Enter extruder number to select from 0-4"));
+    while (!Serial.available());
+    int c = Serial.read();
+    switch (c) {
+        case '0':
+            Serial.println(F("Loading filament to Direct Extruder 0"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_X) == BtdeController::IN_JOINER) {
+                controller.toolChange(BtdeController::EXTRUDER_X);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_X);
+            }
+            break;
+        case '1':
+            Serial.println(F("Loading filament to Direct Extruder 1"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_Y) == BtdeController::IN_JOINER) {
+                controller.toolChange(BtdeController::EXTRUDER_Y);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_Y);
+            }
+            break;
+        case '2':
+            Serial.println(F("Loading filament to Direct Extruder 2"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_Z) == BtdeController::IN_JOINER) {
+                controller.toolChange(BtdeController::EXTRUDER_Z);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_Z);
+            }
+            break;
+        case '3':
+            Serial.println(F("Loading filament to Direct Extruder 3"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_E0) == BtdeController::IN_JOINER) {
+                controller.toolChange(BtdeController::EXTRUDER_E0);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_E0);
+            }
+            break;
+        case '4':
+            Serial.println(F("Loading filament to Direct Extruder 4"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_E1) == BtdeController::IN_JOINER) {
+                controller.toolChange(BtdeController::EXTRUDER_E1);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_E1);
+            }
+            break;
+        default:
+            Serial.println(F(" Error input. Supported numbers are 0,1,2,3,4"));
+            break;
+    }
+    Serial.println(F(" Press ENTER to continue"));
+}
+
+void usbEject() {
+    Serial.println("\033[2J");
+    Serial.println(F("****************************************************************************"));
+    Serial.print(F("BTDESystem "));
+    Serial.println(F(BTDE_VERSION));
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("Eject filament from system."));
+    Serial.println(F("****************************************************************************"));
+    Serial.println(F("Enter extruder number to eject from 0-4"));
+    while (!Serial.available());
+    int c = Serial.read();
+    switch (c) {
+        case '0':
+            Serial.println(F("Ejecting Extruder 0"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_X) != BtdeController::UNLOADED) {
+                controller.ejectFilament(BtdeController::EXTRUDER_X);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_X);
+            }
+            break;
+        case '1':
+            Serial.println(F("Ejecting Extruder 1"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_Y) != BtdeController::UNLOADED) {
+                controller.ejectFilament(BtdeController::EXTRUDER_Y);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_Y);
+            }
+            break;
+        case '2':
+            Serial.println(F("Ejecting Extruder 2"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_Z) != BtdeController::UNLOADED) {
+                controller.ejectFilament(BtdeController::EXTRUDER_Z);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_Z);
+            }
+            break;
+        case '3':
+            Serial.println(F("Ejecting Extruder 3"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_E0) != BtdeController::UNLOADED) {
+                controller.ejectFilament(BtdeController::EXTRUDER_E0);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_E0);
+            }
+            break;
+        case '4':
+            Serial.println(F("Ejecting Extruder 4"));
+            if (controller.getFilamentStatus(BtdeController::EXTRUDER_E1) != BtdeController::UNLOADED) {
+                controller.ejectFilament(BtdeController::EXTRUDER_E1);
+                Serial.println(F("Done.."));
+            } else {
+                usbLoadToCompensatorError(BtdeController::EXTRUDER_E1);
+            }
+            break;
+        default:
+            Serial.println(F(" Error input. Supported numbers are 0,1,2,3,4"));
+            break;
+    }
+    Serial.println(F(" Press ENTER to continue"));
 }
 
 void loop() {
@@ -407,20 +677,27 @@ void loop() {
         switch (c) {
             case 'E': //Ex eject filament from bowden extruder
             case 'e': //Ex eject filament from bowden extruder
-                usbEjectFromBowden();
+                usbEject();
                 break;
             case 'C': //Cx load filament into the bowden extruder and push it in half of compensator
             case 'c': //Cx load filament into the bowden extruder and push it in half of compensator
                 // as next, user must manually introduce the filament into the carriage
+                usbLoadToCompensator();
                 break;
             case 'L': //Lx load filament into inactive position in joiner, from half of compensator
             case 'l': //Lx load filament into inactive position in joiner, from half of compensator
+                usbLoadToJoiner();
                 break;
             case 'T': //Tx load the filament into the direct extruder idler.
             case 't': //Tx load the filament into the direct extruder idler.
+                usbToolChange();
                 break;
             case 'I': //Ix unload the filament from the direct extruder to inactive position in joiner.
             case 'i': //Ix unload the filament from the direct extruder to inactive position in joiner.
+                break;
+            case 'R': //Ix unload the filament from the direct extruder to inactive position in joiner.
+            case 'r': //Ix unload the filament from the direct extruder to inactive position in joiner.
+                controller.resetEeprom();
                 break;
             case '?': //Show current status. 
                 usbShowStatus();

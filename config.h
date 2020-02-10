@@ -20,21 +20,25 @@ extern "C" {
 
     //-------------------------------------------------------------------------
 #define ENDSTOP_FEED_LENGTH 10// Length of filament retracted/pushed on endstop hit
-#define BOWDEN_EXTRUDER_TO_COMPENSATOR_TUBE_LENGTH 500 //PTFE tube length in mm
-#define COMPENSATOR_LENGTH 90 //Length of compensator including quick connectors
-#define COMPENSATOR_TO_JOINER_TUBE_LENGTH 200 // PTFE tube length in mm + mm to inactive filament position in joiner
+#define BOWDEN_EXTRUDER_TO_COMPENSATOR_TUBE_LENGTH 580 //PTFE tube length in mm 
+#define FROM_DIRECT_TO_PARKING_LENGTH 90 //Length of compensator including quick connectors
+#define COMPENSATOR_TO_JOINER_TUBE_LENGTH_X 985 // PTFE tube length in mm + mm to inactive filament position in joiner
+#define COMPENSATOR_TO_JOINER_TUBE_LENGTH_Y 970 // PTFE tube length in mm + mm to inactive filament position in joiner
+#define COMPENSATOR_TO_JOINER_TUBE_LENGTH_Z 970 // PTFE tube length in mm + mm to inactive filament position in joiner
+#define COMPENSATOR_TO_JOINER_TUBE_LENGTH_E0 970 // PTFE tube length in mm + mm to inactive filament position in joiner
+#define COMPENSATOR_TO_JOINER_TUBE_LENGTH_E1 970 // PTFE tube length in mm + mm to inactive filament position in joiner
 #define JOINER_INACTIVE_POSITION_TO_DIRECT_EXTRUDER 25 // Length from inactive position in joiner to direct extruder in mm
 
     //--------------Extruders--------------------------------------------------
-#define ETRUDER_X_STEPS_PER_MM 391
+#define ETRUDER_X_STEPS_PER_MM 397
 #define ETRUDER_X_ACCELERATION 500 // 20kHz/(acceleration*hardcoded curve)
 #define ETRUDER_X_MAX_SPEED 0 // 0-20kHz, 1-10kHz, 2-5kHz ...
-#define ETRUDER_X_REVERSE false
+#define ETRUDER_X_REVERSE true
 
-#define ETRUDER_Y_STEPS_PER_MM 391
+#define ETRUDER_Y_STEPS_PER_MM 397
 #define ETRUDER_Y_ACCELERATION 500 // 20kHz/(acceleration*hardcoded curve)
 #define ETRUDER_Y_MAX_SPEED 0 // 0-20kHz, 1-10kHz, 2-5kHz ...
-#define ETRUDER_Y_REVERSE false
+#define ETRUDER_Y_REVERSE true
 
 #define ETRUDER_Z_STEPS_PER_MM 391
 #define ETRUDER_Z_ACCELERATION 500 // 20kHz/(acceleration*hardcoded curve)

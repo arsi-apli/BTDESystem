@@ -33,7 +33,9 @@ public:
         UNLOADED,
         IN_COMPENSATOR,
         IN_JOINER,
+        LOADING,
         LOADED,
+        WAIT_FOR_DIRECT
     };
 
     struct SystemConfig {
@@ -49,9 +51,18 @@ public:
     void endStopsIsr();
     void loadFromEeprom();
     void saveToEeprom();
+    void resetEeprom();
     boolean isLoadedFromEeprom();
     void initSystem();
     void selectExtruderMotor(ExtrudersNames extruderName, boolean eeprom);
+    void loadToCompensator(ExtrudersNames extruderName);
+    void loadToJoiner(ExtrudersNames extruderName);
+    void ejectFilament(ExtrudersNames extruderName);
+    void toolChange(ExtrudersNames extruderName);
+    
+    
+    FilamentStatus getFilamentStatus(ExtrudersNames extruderName);
+    int getCompensatorToJoinerLength(ExtrudersNames extruderName);
 
 private:
     SystemConfig systemConfig;
